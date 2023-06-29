@@ -5,6 +5,7 @@ const races = require("./race.mongo");
 
 const url = "https://www.formula1.com/en/results.html/2023/races.html";
 
+//crawing race result data from website
 function loadedRaceData() {
   return Promise.all(
     [2023, 2022].map((id) =>
@@ -58,4 +59,17 @@ async function getAllRaces() {
   return await races.find({}, { _id: 0, __v: 0 });
 }
 
-module.exports = { loadedRaceData, getAllRaces };
+async function getQueryRaces(year, query) {
+  let findQuery;
+
+  if (year) {
+    findQuery = {
+      $expr: {
+        $eq: [{ $year: "$date" }, year],
+      },
+    };
+  }
+  return await races.find({ ...findQuery, ...query }, { _id: 0, __v: 0 });
+}
+
+module.exports = { loadedRaceData, getAllRaces, getQueryRaces };
